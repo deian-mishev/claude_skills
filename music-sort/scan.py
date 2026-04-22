@@ -2,28 +2,32 @@
 """
 Usage: python3 scan.py <folder>
 
-Recursively finds all music files under <folder>, reads metadata via ffprobe,
-and prints a single JSON array to stdout. Falls back to empty tags if ffprobe
-fails or is unavailable for a file.
+Recursively finds all music files under <folder>, reads metadata via mutagen
+(auto-installed on first run), and prints a single JSON array to stdout.
+Falls back to empty tags if a file's tags cannot be read.
 """
 
 import json
 import os
-import shutil
-import subprocess
 import sys
+
+try:
+    from mutagen import File as MutagenFile
+except ImportError:
+    import subprocess
+    subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'mutagen', '-q'])
+    from mutagen import File as MutagenFile
 
 MUSIC_EXTS = {'.mp3', '.flac', '.wav', '.aac', '.ogg', '.m4a', '.wma', '.aiff'}
 
 
-def ffprobe_tags(path):
+def read_tags(path):
     try:
-        raw = subprocess.check_output(
-            ['ffprobe', '-v', 'quiet', '-print_format', 'json', '-show_format', path],
-            stderr=subprocess.DEVNULL,
-        )
-        tags = {k.lower(): v for k, v in json.loads(raw).get('format', {}).get('tags', {}).items()}
-        return tags
+        audio = MutagenFile(path, easy=True)
+        if not audio or not audio.tags:
+            return {}
+        # mutagen easy=True normalises keys to lowercase across all formats
+        return {k: str(v[0]) if isinstance(v, list) else str(v) for k, v in audio.tags.items()}
     except Exception:
         return {}
 
@@ -36,13 +40,13 @@ def scan(folder):
             if ext not in MUSIC_EXTS:
                 continue
             path = os.path.join(root, name)
-            tags = ffprobe_tags(path)
-            track = tags.get('track', '').split('/')[0].lstrip('0') or ''
+            tags = read_tags(path)
+            track = tags.get('tracknumber', '').split('/')[0].lstrip('0') or ''
             results.append({
                 'path':         path,
                 'size':         os.path.getsize(path),
-                'artist':       tags.get('artist') or tags.get('album_artist') or '',
-                'album_artist': tags.get('album_artist') or '',
+                'artist':       tags.get('artist') or tags.get('albumartist') or '',
+                'album_artist': tags.get('albumartist') or '',
                 'album':        tags.get('album') or '',
                 'title':        tags.get('title') or '',
                 'track':        track,
@@ -55,10 +59,6 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         print('Usage: scan.py <folder>', file=sys.stderr)
         sys.exit(1)
-
-    if not shutil.which('ffprobe'):
-        print('Warning: ffprobe not found. Install with: brew install ffmpeg', file=sys.stderr)
-        print('Falling back to filename-only metadata.', file=sys.stderr)
 
     folder = os.path.expanduser(sys.argv[1])
     print(json.dumps(scan(folder), indent=2))
