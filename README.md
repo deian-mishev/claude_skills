@@ -10,7 +10,7 @@ Skills extend Claude Code with reusable, domain-specific workflows triggered via
 
 | Skill | Trigger | Description |
 |-------|---------|-------------|
-| [music-sort] | `/music-sort` | Organizes a local music folder: reads ID3/Vorbis tags via `ffprobe`, parses filenames for missing metadata, sorts files into `Artist/Album/` subfolders, detects duplicates, and generates an `undo.sh` rollback script. |
+| [music-sort] | `/music-sort` | Organizes a local music folder: reads ID3/Vorbis tags via `mutagen` (auto-installed), parses filenames for missing metadata, sorts files into `Artist/` subfolders, detects duplicates, and generates an `undo.sh` rollback script. |
 
 ## Usage
 
@@ -27,17 +27,6 @@ git clone https://github.com/deian-mishev/claude_skills.git ~/.claude/skills
 
 * [CLAUDE_CODE] - Anthropic CLI for Claude
 * [PYTHON] - Python 3.8+ (bundled on macOS 12+; system 3.11.4)
-
-## Project Structure
-
-```
-.
-+-- music-sort/
-|   +-- SKILL.md              # Skill definition and step-by-step instructions for Claude
-|   +-- scan.py               # Batch ffprobe metadata extractor → JSON array
-|   +-- parse_filename.py     # Filename → artist/title/track/confidence parser
-|   +-- apply.py              # JSON plan executor + undo.sh generator
-```
 
 ## Adding a Skill
 

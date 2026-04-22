@@ -45,9 +45,11 @@ done
 ## Step 4: Build the Plan (Claude reasoning, no tool calls)
 
 Using the merged metadata, determine the target path for each file:
-- With album: `{folder}/{Artist}/{Album}/{Artist} - {Track##} - {Title}.ext` (zero-pad track to 2 digits)
-- Without album: `{folder}/{Artist}/{Artist} - {Title}.ext`
+- With track: `{folder}/{Artist}/{Artist} - {Track##} - {Title}.ext` (zero-pad track to match the widest track number in the collection, minimum 2 digits)
+- Without track: `{folder}/{Artist}/{Artist} - {Title}.ext`
 - Unknown artist: `{folder}/Unknown Artist/{Title}.ext`
+
+Album is ignored for folder structure — files go directly under the artist folder.
 
 Sanitize names: strip characters illegal in file paths (`/ : * ? " < > |`), collapse multiple spaces.
 
