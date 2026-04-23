@@ -6,7 +6,7 @@ description: "A music file organizer"
 Music-file organizer. CLI tools only. Scripts in `~/.claude/skills/music-sort/`:
 - `scan.py <folder>` → JSON array: `path, size, artist, album_artist, album, title, track, year`
 - `parse_filename.py "<stem>"` → `{artist, title, track, confidence}`
-- `apply.py <plan.json> <folder> [--dry-run] [--to-mp3]` → executes plan, strips tags, deletes plan file, writes `undo.sh`
+- `apply.py <plan.json> <folder> [--dry-run] [--to-mp3]` → executes plan, strips tags, deletes plan file
 
 Requires ffmpeg (`brew install ffmpeg`).
 
@@ -52,7 +52,7 @@ Write plan JSON, then run:
 python3 ~/.claude/skills/music-sort/apply.py <folder>/music_sort_plan.json <folder>
 # append --to-mp3 if needed
 ```
-apply.py handles mkdir, mv, tag-strip, optional conversion, undo.sh, and deletes the plan JSON.
+apply.py handles mkdir, mv, tag-strip, artwork removal, optional conversion and deletes the plan JSON.
 
 ## Step 7: Summary
 Print apply.py summary line + uncertain-row count + conversion count if `--to-mp3`.

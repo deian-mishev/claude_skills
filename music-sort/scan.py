@@ -53,8 +53,8 @@ def scan(folder):
             results.append({
                 'path':         path,
                 'size':         os.path.getsize(path),
-                'artist':       tags.get('artist') or tags.get('album_artist') or tags.get('albumartist') or '',
-                'album_artist': tags.get('album_artist') or tags.get('albumartist') or '',
+                'artist':       tags.get('artist') or tags.get('album_artist') or tags.get('albumartist') or tags.get('album artist') or '',
+                'album_artist': tags.get('album_artist') or tags.get('albumartist') or tags.get('album artist') or '',
                 'album':        tags.get('album') or '',
                 'title':        tags.get('title') or '',
                 'track':        track,
